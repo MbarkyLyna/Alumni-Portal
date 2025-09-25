@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Intelligence Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* Background Video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .video-background video {
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.3;
+        }
+        
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(91, 35, 51, 0.8), rgba(247, 244, 243, 0.9));
+            z-index: -1;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(91, 35, 51, 0.95);
+            color: #F7F4F3;
+            padding: 15px 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header .logo {
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .header .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .header .logo::before {
+            content: "🎓";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .header .admin-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .auth-buttons button {
+            padding: 8px 16px;
+            border: 2px solid #F7F4F3;
+            background: transparent;
+            color: #F7F4F3;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .auth-buttons button:hover {
+            background: #F7F4F3;
+            color: #5B2333;
+        }
+        
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #F7F4F3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #5B2333;
+        }
+        
+        .main-content {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .search-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .search-container h2 {
+            color: #5B2333;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .search-container p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        
+        .search-input-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-container input {
+            padding: 15px 20px;
+            width: 400px;
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .search-container input:focus {
+            outline: none;
+            border-color: #5B2333;
+        }
+        
+        .search-container button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #5B2333, #8B3A47);
+            color: #F7F4F3;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(91, 35, 51, 0.3);
+        }
+        
+        .search-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(91, 35, 51, 0.4);
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin-left: 15px;
+            font-size: 1.2em;
+        }
+        
+        .error-msg {
+            color: #d32f2f;
+            margin-top: 15px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .result-card {
+            display: none;
+            margin-top: 30px;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-card h3 {
+            color: #5B2333;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #5B2333;
+            padding-bottom: 10px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .result-item b {
+            color: #5B2333;
+            margin-right: 10px;
+        }
+        
+        .result-item a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .options {
+            margin-top: 20px;
+        }
+        
+        .options a {
+            color: #5B2333;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .options a:hover {
+            color: #8B3A47;
+        }
+        
+        .recent-searches {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .recent-searches h3 {
+            color: #5B2333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .recent-searches table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        .recent-searches th, .recent-searches td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .recent-searches th {
+            background: linear-gradient(135deg, #5B2333, #8B3A47);
+            color: #F7F4F3;
+            font-weight: 600;
+        }
+        
+        .recent-searches .status-complete { 
+            background-color: #4caf50; 
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        .recent-searches .status-partial { 
+            background-color: #ff9800; 
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        .recent-searches .status-failed { 
+            background-color: #f44336; 
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+        
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chatbot-toggle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5B2333, #8B3A47);
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(91, 35, 51, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .chatbot-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, #5B2333, #8B3A47);
+            color: white;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chatbot-header h4 {
+            margin: 0;
+            font-size: 1.1em;
+        }
+        
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .chatbot-message {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .chatbot-message.user {
+            background: #e3f2fd;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .chatbot-message.bot {
+            background: #f5f5f5;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .chatbot-input {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .chatbot-input button {
+            padding: 10px 15px;
+            background: #5B2333;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        
+        .footer {
+            background-color: rgba(91, 35, 51, 0.95);
+            color: #F7F4F3;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .search-input-group {
+                flex-direction: column;
+            }
+            
+            .search-container input {
+                width: 100%;
+            }
+            
+            .chatbot-window {
+                width: 300px;
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <div class="video-background">
+        <video autoplay muted loop>
+            <source src="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4" type="video/mp4">
+            <!-- Fallback for when video doesn't load -->
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+
+    <div class="header">
+        <div class="logo" onclick="window.location.href='/'">
+            Alumni Intelligence Portal
+        </div>
+        <div class="admin-section">
+            <div id="authButtons" class="auth-buttons">
+                <button onclick="showLogin()">Login</button>
+                <button onclick="showSignup()">Sign Up</button>
+            </div>
+            <div id="adminInfo" class="admin-info" style="display: none;">
+                <span>Welcome, Admin</span>
+                <div class="admin-avatar">A</div>
+                <button onclick="logout()" style="background: none; border: 1px solid #F7F4F3; color: #F7F4F3; padding: 5px 10px; border-radius: 15px; cursor: pointer;">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="search-container">
+            <h2>Alumni Intelligence Search</h2>
+            <p>Transform educational email addresses into comprehensive professional profiles</p>
+            <div class="search-input-group">
+                <input type="text" id="emailInput" placeholder="Enter alumni email address (Format: firstname.lastname@esprit.tn)">
+                <button onclick="searchAlumni()">Quick Search</button>
+                <span id="loadingSpinner" class="loading-spinner">🔄 Searching...</span>
+            </div>
+            <div id="errorMsg" class="error-msg"></div>
+            <div id="resultCard" class="result-card">
+                <h3>Alumni Profile</h3>
+                <div id="resultContent"></div>
+            </div>
+            <div class="options">
+                <a href="#" onclick="openBulkUpload()">Bulk Upload</a>
+                <a href="/database">Database Management</a>
+                <a href="/gemini">Gemini AI</a>
+            </div>
+        </div>
+
+        <div class="recent-searches">
+            <h3>Recent Searches</h3>
+            <table id="recentSearchesTable">
+                <tr>
+                    <th>Email Address</th>
+                    <th>Time</th>
+                    <th>Actions</th>
+                </tr>
+            </table>
+            <a href="#" style="color: #5B2333; font-weight: 500;">View All</a>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">🤖</button>
+        <div id="chatbotWindow" class="chatbot-window">
+            <div class="chatbot-header">
+                <h4>AI Assistant</h4>
+                <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+            </div>
+            <div id="chatbotMessages" class="chatbot-messages">
+                <div class="chatbot-message bot">
+                    Hello! I'm your Alumni Portal AI assistant. How can I help you today?
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2025 Alumni Intelligence Portal
+    </div>
+
+    <script>
+        // Authentication state
+        let isLoggedIn = false;
+
+        function showLogin() {
+            const email = prompt("Enter admin email:");
+            const password = prompt("Enter password:");
+            if (email && password) {
+                // Simple demo authentication
+                if (email.includes("admin") && password.length >= 6) {
+                    isLoggedIn = true;
+                    document.getElementById('authButtons').style.display = 'none';
+                    document.getElementById('adminInfo').style.display = 'flex';
+                } else {
+                    alert("Invalid credentials. Try email with 'admin' and password with 6+ characters.");
+                }
+            }
+        }
+
+        function showSignup() {
+            const email = prompt("Enter admin email:");
+            const password = prompt("Enter password:");
+            if (email && password) {
+                alert("Admin account created! Please login with your credentials.");
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('adminInfo').style.display = 'none';
+        }
+
+        // Search functionality
+        function validateEspritEmail(email) {
+            return /^[A-Za-z]+\.[A-Za-z]+@esprit\.tn$/.test(email);
+        }
+
+        async function searchAlumni() {
+            const email = document.getElementById('emailInput').value.trim();
+            const errorMsg = document.getElementById('errorMsg');
+            const resultCard = document.getElementById('resultCard');
+            const resultContent = document.getElementById('resultContent');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            errorMsg.style.display = 'none';
+            resultCard.style.display = 'none';
+            resultContent.innerHTML = '';
+
+            if (!validateEspritEmail(email)) {
+                errorMsg.innerText = 'Please enter a valid esprit email (e.g., Ahmed.BenSalem@esprit.tn)';
+                errorMsg.style.display = 'block';
+                return;
+            }
+            
+            spinner.style.display = 'inline';
+            try {
+                const response = await fetch(`/api/search?email=${encodeURIComponent(email)}`);
+                if (!response.ok) throw new Error('Search failed.');
+                const data = await response.json();
+                updateRecentSearches(data);
+                
+                // Show result card
+                let html = `<div class="result-item"><b>Name:</b> ${data.name || 'N/A'}</div>`;
+                html += `<div class="result-item"><b>Family Name:</b> ${data.familyName || 'N/A'}</div>`;
+                html += `<div class="result-item"><b>LinkedIn:</b> ${data.linkedin ? `<a href="${data.linkedin}" target="_blank">View Profile</a>` : 'N/A'}</div>`;
+                html += `<div class="result-item"><b>Facebook:</b> ${data.facebook ? `<a href="${data.facebook}" target="_blank">View Profile</a>` : 'N/A'}</div>`;
+                resultContent.innerHTML = html;
+                resultCard.style.display = 'block';
+            } catch (err) {
+                errorMsg.innerText = 'Could not find alumni information. Please try again.';
+                errorMsg.style.display = 'block';
+            } finally {
+                spinner.style.display = 'none';
+            }
+        }
+
+        function updateRecentSearches(data) {
+            const table = document.getElementById('recentSearchesTable');
+            const row = table.insertRow(-1);
+            row.insertCell(0).innerText = data.email;
+            row.insertCell(1).innerText = data.time || 'Just now';
+            const actionsCell = row.insertCell(2);
+            actionsCell.innerHTML = `
+                <button onclick="editAlumni('${data.email}')" style="background: linear-gradient(135deg, #5B2333, #8B3A47); color: #F7F4F3; border: none; padding: 12px 20px; border-radius: 15px; cursor: pointer; margin-right: 8px; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(91, 35, 51, 0.3); font-size: 1em;">Edit</button>
+                <button onclick="deleteAlumni('${data.email}')" style="background: linear-gradient(135deg, #d32f2f, #f44336); color: white; border: none; padding: 12px 20px; border-radius: 15px; cursor: pointer; font-weight: 500; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3); font-size: 1em;">Delete</button>
+            `;
+        }
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleChatbotKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chatbotMessages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chatbot-message user';
+            userMessage.textContent = message;
+            messagesContainer.appendChild(userMessage);
+            
+            input.value = '';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                // Add bot response
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chatbot-message bot';
+                botMessage.textContent = data.response;
+                messagesContainer.appendChild(botMessage);
+            } catch (error) {
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'chatbot-message bot';
+                errorMessage.textContent = 'Sorry, I encountered an error. Please try again.';
+                messagesContainer.appendChild(errorMessage);
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Load recent searches on page load
+        async function loadRecentSearches() {
+            try {
+                const response = await fetch('/api/recent');
+                const data = await response.json();
+                data.forEach(updateRecentSearches);
+            } catch (error) {
+                console.log('Could not load recent searches');
+            }
+        }
+
+        loadRecentSearches();
+
+        // Bulk upload functionality
+        function openBulkUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.txt,.csv';
+            input.onchange = async function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    
+                    try {
+                        const response = await fetch('/api/bulk-upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        if (response.ok) {
+                            alert(`Successfully processed ${result.results.length} alumni profiles!`);
+                            loadRecentSearches(); // Refresh the table
+                        } else {
+                            alert(`Error: ${result.error}`);
+                        }
+                    } catch (error) {
+                        alert('Error uploading file');
+                    }
+                }
+            };
+            input.click();
+        }
+
+        // Edit and delete functions
+        function editAlumni(email) {
+            window.location.href = `/database?edit=${encodeURIComponent(email)}`;
+        }
+
+        async function deleteAlumni(email) {
+            if (!confirm(`Are you sure you want to delete ${email}?`)) return;
+
+            try {
+                const response = await fetch(`/api/alumni/${encodeURIComponent(email)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert('Alumni deleted successfully');
+                    loadRecentSearches(); // Refresh the table
+                } else {
+                    alert('Error deleting alumni');
+                }
+            } catch (error) {
+                console.error('Error deleting alumni:', error);
+                alert('Error deleting alumni');
+            }
+        }
+
+        // Handle Enter key in search input
+        document.getElementById('emailInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchAlumni();
+            }
+        });
+    </script>
+</body>
+</html>
