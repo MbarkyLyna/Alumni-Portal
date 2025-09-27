@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login - Alumni Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f4; }
+        .container { max-width: 420px; margin: 60px auto; background: #fff; padding: 24px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 16px; color: #5B2333; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { width: 100%; padding: 12px; background: #5B2333; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+        a { color: #5B2333; text-decoration: none; }
+        .error { color: #d32f2f; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Login</h1>
+        <input id="email" type="email" placeholder="Email" />
+        <input id="password" type="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <div id="error" class="error"></div>
+        <p style="margin-top:12px">No account? <a href="/auth/signup">Sign up</a></p>
+    </div>
+    <script>
+        async function login() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const res = await fetch('/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const data = await res.json();
+            if (res.ok) {
+                window.location.href = '/';
+            } else {
+                document.getElementById('error').innerText = data.error || 'Login failed';
+            }
+        }
+    </script>
+</body>
+</html>
+
+

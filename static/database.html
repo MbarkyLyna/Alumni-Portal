@@ -19,6 +19,9 @@
         }
         
         .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
             background-color: rgba(91, 35, 51, 0.95);
             color: #F7F4F3;
             padding: 15px 30px;
@@ -423,7 +426,7 @@
                         <td>${alumni.familyName || 'N/A'}</td>
                         <td>${alumni.linkedin ? `<a href="${alumni.linkedin}" target="_blank">View</a>` : 'N/A'}</td>
                         <td>${alumni.facebook ? `<a href="${alumni.facebook}" target="_blank">View</a>` : 'N/A'}</td>
-                        <td>${alumni.time || 'N/A'}</td>
+                        <td>${alumni.time || ''}</td>
                         <td>
                             <div class="action-buttons">
                                 <button class="edit-btn" onclick="editAlumni('${alumni.email}')">Edit</button>
@@ -492,7 +495,6 @@
             try {
                 let response;
                 if (editingEmail) {
-                    // Update existing alumni
                     response = await fetch(`/api/alumni/${encodeURIComponent(editingEmail)}`, {
                         method: 'PUT',
                         headers: {
@@ -501,9 +503,8 @@
                         body: JSON.stringify(alumni)
                     });
                 } else {
-                    // Add new alumni
-                    response = await fetch('/api/search', {
-                        method: 'GET',
+                    response = await fetch('/api/alumni', {
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },

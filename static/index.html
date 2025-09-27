@@ -52,6 +52,9 @@
         }
         
         .header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -130,6 +133,25 @@
             max-width: 1200px;
             margin: 0 auto;
         }
+        .hero {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 30px;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        .hero h1 { color:#5B2333; margin-bottom: 10px; font-weight:600; }
+        .hero p { color:#555; line-height:1.6; margin-top:10px; }
+        .hero img { width:100%; border-radius:16px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+        .gallery { display:grid; grid-template-columns: repeat(3,1fr); gap:12px; margin-top:15px; }
+        .gallery img { width:100%; height:140px; object-fit:cover; border-radius:12px; }
+        .social-links { margin-top: 18px; }
+        .social-links a { display:inline-block; margin-right:12px; color:#5B2333; font-weight:600; text-decoration:none; border:1px solid #5B2333; padding:8px 12px; border-radius:16px; }
         
         .search-container {
             text-align: center;
@@ -486,7 +508,6 @@
         <div class="admin-section">
             <div id="authButtons" class="auth-buttons">
                 <button onclick="showLogin()">Login</button>
-                <button onclick="showSignup()">Sign Up</button>
             </div>
             <div id="adminInfo" class="admin-info" style="display: none;">
                 <span>Welcome, Admin</span>
@@ -497,6 +518,8 @@
     </div>
 
     <div class="main-content">
+        <!-- Frontoffice moved to dedicated page: /frontoffice.html -->
+
         <div class="search-container">
             <h2>Alumni Intelligence Search</h2>
             <p>Transform educational email addresses into comprehensive professional profiles</p>
@@ -555,37 +578,39 @@
     </div>
 
     <script>
-        // Authentication state
+        // Authentication state (server-backed)
         let isLoggedIn = false;
 
         function showLogin() {
-            const email = prompt("Enter admin email:");
-            const password = prompt("Enter password:");
-            if (email && password) {
-                // Simple demo authentication
-                if (email.includes("admin") && password.length >= 6) {
+            window.location.href = '/auth/login';
+        }
+
+        function showSignup() {
+            window.location.href = '/auth/signup';
+        }
+
+        async function logout() {
+            await fetch('/auth/logout', { method: 'POST' });
+            isLoggedIn = false;
+            window.location.href = '/auth/login';
+        }
+
+        // On load, redirect to login if not authenticated
+        (async function initAuthUi(){
+            try {
+                const res = await fetch('/auth/me');
+                const data = await res.json();
+                if (data && data.loggedIn) {
                     isLoggedIn = true;
                     document.getElementById('authButtons').style.display = 'none';
                     document.getElementById('adminInfo').style.display = 'flex';
                 } else {
-                    alert("Invalid credentials. Try email with 'admin' and password with 6+ characters.");
+                    window.location.href = '/auth/login';
                 }
+            } catch (e) {
+                window.location.href = '/auth/login';
             }
-        }
-
-        function showSignup() {
-            const email = prompt("Enter admin email:");
-            const password = prompt("Enter password:");
-            if (email && password) {
-                alert("Admin account created! Please login with your credentials.");
-            }
-        }
-
-        function logout() {
-            isLoggedIn = false;
-            document.getElementById('authButtons').style.display = 'flex';
-            document.getElementById('adminInfo').style.display = 'none';
-        }
+        })();
 
         // Search functionality
         function validateEspritEmail(email) {
@@ -680,11 +705,10 @@
                 });
                 
                 const data = await response.json();
-                
-                // Add bot response
+                const text = (data && data.response) ? String(data.response).trim() : '';
                 const botMessage = document.createElement('div');
                 botMessage.className = 'chatbot-message bot';
-                botMessage.textContent = data.response;
+                botMessage.textContent = text || 'I could not generate a response. Please try a different question.';
                 messagesContainer.appendChild(botMessage);
             } catch (error) {
                 const errorMessage = document.createElement('div');
@@ -743,7 +767,74 @@
 
         // Edit and delete functions
         function editAlumni(email) {
-            window.location.href = `/database?edit=${encodeURIComponent(email)}`;
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+                <div style="background:white;padding:30px;border-radius:15px;max-width:500px;width:90%;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+                    <h3 style="color:#5B2333;margin-bottom:20px;">Edit Alumni</h3>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block;margin-bottom:5px;font-weight:600;color:#5B2333;">Email</label>
+                        <input type="email" id="editEmail" value="${email}" readonly style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;background:#f5f5f5;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block;margin-bottom:5px;font-weight:600;color:#5B2333;">Name</label>
+                        <input type="text" id="editName" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block;margin-bottom:5px;font-weight:600;color:#5B2333;">Family Name</label>
+                        <input type="text" id="editFamilyName" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="display:block;margin-bottom:5px;font-weight:600;color:#5B2333;">LinkedIn</label>
+                        <input type="url" id="editLinkedin" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:5px;font-weight:600;color:#5B2333;">Facebook</label>
+                        <input type="url" id="editFacebook" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+                    </div>
+                    <div style="display:flex;gap:10px;justify-content:flex-end;">
+                        <button onclick="closeEditModal()" style="padding:10px 20px;background:#f5f5f5;border:1px solid #ddd;border-radius:8px;cursor:pointer;">Cancel</button>
+                        <button onclick="saveEdit()" style="padding:10px 20px;background:#5B2333;color:white;border:none;border-radius:8px;cursor:pointer;">Save</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Load current data
+            fetch(`/api/alumni/${encodeURIComponent(email)}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('editName').value = data.name || '';
+                    document.getElementById('editFamilyName').value = data.familyName || '';
+                    document.getElementById('editLinkedin').value = data.linkedin || '';
+                    document.getElementById('editFacebook').value = data.facebook || '';
+                });
+        }
+
+        function closeEditModal() {
+            document.body.removeChild(document.body.lastChild);
+        }
+
+        async function saveEdit() {
+            const email = document.getElementById('editEmail').value;
+            const payload = {
+                name: document.getElementById('editName').value.trim(),
+                familyName: document.getElementById('editFamilyName').value.trim(),
+                linkedin: document.getElementById('editLinkedin').value.trim(),
+                facebook: document.getElementById('editFacebook').value.trim()
+            };
+            const res = await fetch(`/api/alumni/${encodeURIComponent(email)}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+                alert('Saved successfully');
+                closeEditModal();
+                loadRecentSearches();
+            } else {
+                alert('Save failed');
+            }
         }
 
         async function deleteAlumni(email) {
@@ -758,11 +849,12 @@
                     alert('Alumni deleted successfully');
                     loadRecentSearches(); // Refresh the table
                 } else {
-                    alert('Error deleting alumni');
+                    const errorData = await response.json().catch(() => ({}));
+                    alert(`Error deleting alumni: ${errorData.error || 'Unknown error'}`);
                 }
             } catch (error) {
                 console.error('Error deleting alumni:', error);
-                alert('Error deleting alumni');
+                alert(`Error deleting alumni: ${error.message || 'Network error'}`);
             }
         }
 
