@@ -195,6 +195,177 @@
 
         .gallery-item:hover { transform: scale(1.05); }
 
+        /* About Section */
+        .about-section {
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .about-text h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            margin-top: 32px;
+        }
+
+        .about-text h3:first-child {
+            margin-top: 0;
+        }
+
+        .about-text p {
+            color: var(--dark);
+            line-height: 1.8;
+            margin-bottom: 24px;
+            font-size: 1.1rem;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-item h4 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-item p {
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        /* Success Stories Section */
+        .success-stories-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(91, 35, 51, 0.05), rgba(139, 58, 71, 0.05));
+        }
+
+        .success-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .story-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .story-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .story-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .story-card h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .story-card p {
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* Campus Life Section */
+        .campus-life-section {
+            padding: 80px 0;
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .campus-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .campus-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .campus-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .campus-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .campus-item h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .campus-item p {
+            color: var(--dark);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
         /* Connect Section */
         .connect-section {
             padding: 80px 0;
@@ -404,6 +575,155 @@
             transform: translateX(0);
         }
 
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .chatbot-toggle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--gradient);
+            border: none;
+            color: white;
+            font-size: 1.8em;
+            cursor: pointer;
+            box-shadow: var(--shadow-hover);
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-toggle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 40px rgba(91, 35, 51, 0.6);
+        }
+
+        .chatbot-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-hover);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chatbot-header {
+            background: var(--gradient);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h4 {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .chatbot-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .chatbot-close:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f8f9fa;
+        }
+
+        .chatbot-message {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .chatbot-message.user {
+            background: var(--gradient);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chatbot-message.bot {
+            background: white;
+            color: var(--dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .chatbot-input {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 12px;
+            background: white;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95em;
+            transition: border-color 0.3s ease;
+        }
+
+        .chatbot-input input:focus {
+            border-color: var(--primary);
+        }
+
+        .chatbot-input button {
+            padding: 12px 20px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .chatbot-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(91, 35, 51, 0.3);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero-content { grid-template-columns: 1fr; gap: 40px; }
@@ -411,12 +731,19 @@
             .form-grid { grid-template-columns: 1fr; }
             .social-links { justify-content: center; }
             .image-gallery { grid-template-columns: repeat(2, 1fr); }
+            
+            .about-grid { grid-template-columns: 1fr; gap: 40px; }
+            .about-stats { grid-template-columns: repeat(2, 1fr); }
+            .stories-grid { grid-template-columns: 1fr; }
+            .campus-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
             .hero-text h1 { font-size: 2rem; }
             .connect-form { padding: 24px; }
             .image-gallery { grid-template-columns: 1fr; }
+            .about-stats { grid-template-columns: 1fr; }
+            .chatbot-window { width: 300px; height: 400px; }
         }
     </style>
     <meta name="robots" content="noindex">
@@ -456,9 +783,96 @@
             <div class="hero-visual">
                 <img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=1200&auto=format&fit=crop" alt="Campus" class="main-image" />
                 <div class="image-gallery">
-                    <img src="https://images.unsplash.com/photo-1529257414772-1960b7bea4eb?q=80&w=800&auto=format&fit=crop" alt="Library" class="gallery-item" />
-                    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Graduation" class="gallery-item" />
-                    <img src="https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?q=80&w=800&auto=format&fit=crop" alt="Hall" class="gallery-item" />
+                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3" alt="University Library" class="gallery-item" />
+                    <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3" alt="Graduation Ceremony" class="gallery-item" />
+                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3" alt="University Campus" class="gallery-item" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Esprit Section -->
+    <section class="about-section">
+        <div class="about-content">
+            <h2 class="section-title">About Esprit University</h2>
+            <div class="about-grid">
+                <div class="about-text">
+                    <h3>Excellence in Engineering Education</h3>
+                    <p>Esprit is a leading private engineering school in Tunisia, committed to providing world-class education in engineering and technology. Since our founding, we have been dedicated to nurturing the next generation of engineers, innovators, and leaders who will shape the future of technology and society.</p>
+                    
+                    <h3>Our Mission</h3>
+                    <p>To provide exceptional engineering education that combines theoretical knowledge with practical experience, preparing our students to become innovative engineers capable of meeting the challenges of the modern world. We foster creativity, critical thinking, and professional excellence in all our programs.</p>
+                    
+                    <h3>Academic Programs</h3>
+                    <p>Esprit offers comprehensive engineering programs including Computer Science, Telecommunications, Industrial Engineering, and more. Our curriculum is designed to meet international standards while addressing local and regional technological needs.</p>
+                </div>
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <h4>15+</h4>
+                        <p>Years of Excellence</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>5000+</h4>
+                        <p>Graduates</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>95%</h4>
+                        <p>Employment Rate</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>50+</h4>
+                        <p>Industry Partners</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Alumni Success Stories Section -->
+    <section class="success-stories-section">
+        <div class="success-content">
+            <h2 class="section-title">Alumni Success Stories</h2>
+            <p class="section-subtitle">Our graduates are making their mark in the world</p>
+            <div class="stories-grid">
+                <div class="story-card">
+                    <div class="story-icon">💼</div>
+                    <h3>Tech Leaders</h3>
+                    <p>Many of our alumni have risen to leadership positions in major technology companies, driving innovation and digital transformation across industries.</p>
+                </div>
+                <div class="story-card">
+                    <div class="story-icon">🚀</div>
+                    <h3>Entrepreneurs</h3>
+                    <p>Esprit graduates have founded successful startups and tech companies, contributing to Tunisia's growing entrepreneurial ecosystem.</p>
+                </div>
+                <div class="story-card">
+                    <div class="story-icon">🌍</div>
+                    <h3>Global Impact</h3>
+                    <p>Our alumni work in prestigious companies worldwide, from Silicon Valley to European tech hubs, representing Tunisia on the global stage.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Campus Life Section -->
+    <section class="campus-life-section">
+        <div class="campus-content">
+            <h2 class="section-title">Campus Life & Facilities</h2>
+            <div class="campus-grid">
+                <div class="campus-item">
+                    <h3>🏛️ Modern Campus</h3>
+                    <p>Our state-of-the-art campus provides students with modern facilities, including advanced laboratories, computer centers, and collaborative learning spaces.</p>
+                </div>
+                <div class="campus-item">
+                    <h3>📚 Research Excellence</h3>
+                    <p>Esprit is committed to research and innovation, with faculty and students engaged in cutting-edge research projects that address real-world challenges.</p>
+                </div>
+                <div class="campus-item">
+                    <h3>🤝 Industry Partnerships</h3>
+                    <p>We maintain strong partnerships with leading technology companies, providing students with internship opportunities and industry exposure.</p>
+                </div>
+                <div class="campus-item">
+                    <h3>🎓 Student Support</h3>
+                    <p>Comprehensive student services including career counseling, academic support, and extracurricular activities ensure a well-rounded educational experience.</p>
                 </div>
             </div>
         </div>
@@ -485,20 +899,12 @@
                         <input type="email" id="email" class="form-input" placeholder="firstname.lastname@esprit.tn" />
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Current Job Title</label>
-                        <input type="text" id="jobTitle" class="form-input" placeholder="e.g., Software Engineer at ..." />
-                    </div>
-                    <div class="form-group">
                         <label class="form-label">LinkedIn URL</label>
                         <input type="url" id="linkedin" class="form-input" placeholder="https://www.linkedin.com/in/..." />
                     </div>
                     <div class="form-group">
                         <label class="form-label">Facebook URL</label>
                         <input type="url" id="facebook" class="form-input" placeholder="https://www.facebook.com/..." />
-                    </div>
-                    <div class="form-group full-width">
-                        <label class="form-label">Additional Notes</label>
-                        <textarea id="notes" class="form-input form-textarea" placeholder="Share your achievements, current projects, or anything you'd like the community to know..."></textarea>
                     </div>
                 </div>
                 <button class="submit-btn pulse" onclick="submitConnect()">
@@ -507,6 +913,26 @@
             </div>
         </div>
     </section>
+
+    <!-- AI Assistant Chatbot -->
+    <div class="chatbot-container">
+        <button class="chatbot-toggle" onclick="toggleChatbot()">🤖</button>
+        <div id="chatbotWindow" class="chatbot-window">
+            <div class="chatbot-header">
+                <h4>AI Assistant</h4>
+                <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+            </div>
+            <div id="chatbotMessages" class="chatbot-messages">
+                <div class="chatbot-message bot">
+                    Hello! I'm your Alumni Portal AI assistant. I can help you with information about Esprit University, alumni services, and answer any questions you might have. How can I assist you today?
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Type your message..." onkeypress="handleChatbotKeypress(event)">
+                <button onclick="sendChatMessage()">Send</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="footer-content">
@@ -517,7 +943,7 @@
 
     <script>
         function clearForm() {
-            ['name','familyName','email','linkedin','facebook','jobTitle','notes'].forEach(id => document.getElementById(id).value = '');
+            ['name','familyName','email','linkedin','facebook'].forEach(id => document.getElementById(id).value = '');
         }
 
         function showSuccessMessage() {
@@ -538,8 +964,6 @@
                 familyName: document.getElementById('familyName').value.trim(),
                 linkedin: document.getElementById('linkedin').value.trim(),
                 facebook: document.getElementById('facebook').value.trim(),
-                jobTitle: document.getElementById('jobTitle').value.trim(),
-                notes: document.getElementById('notes').value.trim()
             };
             const res = await fetch('/api/connect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             const msg = document.getElementById('msg');
@@ -551,6 +975,74 @@
                 msg.style.color = '#d32f2f';
                 msg.textContent = data.error || 'Submission failed.';
             }
+        }
+
+        // Chatbot functionality
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbotWindow');
+            chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleChatbotKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatbotInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const messagesContainer = document.getElementById('chatbotMessages');
+            
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chatbot-message user';
+            userMessage.textContent = message;
+            messagesContainer.appendChild(userMessage);
+            
+            input.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chatbot-message bot';
+            typingIndicator.textContent = 'Typing...';
+            typingIndicator.style.fontStyle = 'italic';
+            typingIndicator.style.opacity = '0.7';
+            messagesContainer.appendChild(typingIndicator);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                // Remove typing indicator
+                messagesContainer.removeChild(typingIndicator);
+                
+                const data = await response.json();
+                const text = (data && data.response) ? String(data.response).trim() : '';
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chatbot-message bot';
+                botMessage.textContent = text || 'I could not generate a response. Please try a different question.';
+                messagesContainer.appendChild(botMessage);
+            } catch (error) {
+                // Remove typing indicator
+                messagesContainer.removeChild(typingIndicator);
+                
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'chatbot-message bot';
+                errorMessage.textContent = 'Sorry, I encountered an error. Please try again.';
+                messagesContainer.appendChild(errorMessage);
+            }
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     </script>
 </body>

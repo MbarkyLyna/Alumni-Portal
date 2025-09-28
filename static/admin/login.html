@@ -21,7 +21,6 @@
         <input id="password" type="password" placeholder="Password" />
         <button onclick="login()">Login</button>
         <div id="error" class="error"></div>
-        <p style="margin-top:12px">No account? <a href="/auth/signup">Sign up</a></p>
     </div>
     <script>
         async function login() {
@@ -30,6 +29,9 @@
             const res = await fetch('/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
             const data = await res.json();
             if (res.ok) {
+                if (data.email) {
+                    localStorage.setItem('adminEmail', data.email);
+                }
                 window.location.href = '/';
             } else {
                 document.getElementById('error').innerText = data.error || 'Login failed';

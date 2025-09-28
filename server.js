@@ -123,7 +123,15 @@ app.delete('/api/alumni/:email', (req, res) => {
             return res.status(500).json({ error: 'Database error: ' + err.message });
         }
         if (this.changes === 0) return res.status(404).json({ error: 'Alumni not found' });
-        res.json({ ok: true, message: 'Alumni deleted successfully' });
+        
+        // Also delete from recent searches
+        db.run('DELETE FROM recent_searches WHERE email = ?', [email], (err2) => {
+            if (err2) {
+                console.error('Delete from recent searches error:', err2);
+                // Don't fail the request if this fails, just log it
+            }
+            res.json({ ok: true, message: 'Alumni deleted successfully' });
+        });
     });
 });
 
@@ -161,6 +169,41 @@ app.put('/api/alumni/:email', (req, res) => {
             res.json({ ok: true });
         }
     );
+});
+
+// API: Clear recent searches (admin only)
+app.post('/api/clear-searches', (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
+    db.run('DELETE FROM recent_searches', [], function (err) {
+        if (err) return res.status(500).json({ error: 'DB error' });
+        res.json({ ok: true });
+    });
+});
+
+// API: Bulk delete alumni (admin only)
+app.post('/api/alumni/bulk-delete', (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Unauthorized' });
+    const { emails } = req.body;
+    if (!emails || !Array.isArray(emails) || emails.length === 0) {
+        return res.status(400).json({ error: 'No emails provided' });
+    }
+    
+    const placeholders = emails.map(() => '?').join(',');
+    db.run(`DELETE FROM alumni WHERE email IN (${placeholders})`, emails, function (err) {
+        if (err) {
+            console.error('Bulk delete error:', err);
+            return res.status(500).json({ error: 'Database error: ' + err.message });
+        }
+        
+        // Also delete from recent searches
+        db.run(`DELETE FROM recent_searches WHERE email IN (${placeholders})`, emails, (err2) => {
+            if (err2) {
+                console.error('Bulk delete from recent searches error:', err2);
+                // Don't fail the request if this fails, just log it
+            }
+            res.json({ ok: true, deleted: this.changes });
+        });
+    });
 });
 
 // API: Admin create alumni (insert or replace)
@@ -209,8 +252,41 @@ app.post('/api/bulk-upload', upload.single('file'), (req, res) => {
         // Expected CSV: email,name,familyName,linkedin,facebook
         const [email, name, familyName, linkedin, facebook] = line.split(',').map((s) => (s || '').trim());
         if (!email) continue;
-        stmt.run([email.toLowerCase(), name, familyName, linkedin, facebook]);
-        results.push({ email });
+        
+        // Extract names from email if not provided
+        let finalName = name;
+        let finalFamilyName = familyName;
+        
+        if (!finalName || !finalFamilyName) {
+            const extracted = extractFromEspritEmail(email);
+            if (extracted) {
+                finalName = finalName || extracted.name;
+                finalFamilyName = finalFamilyName || extracted.familyName;
+            }
+        }
+        
+        // Generate social links if not provided
+        let finalLinkedin = linkedin;
+        let finalFacebook = facebook;
+        
+        if (!finalLinkedin || !finalFacebook) {
+            const guessed = guessSocialFromEmail(email);
+            finalLinkedin = finalLinkedin || guessed.linkedin;
+            finalFacebook = finalFacebook || guessed.facebook;
+        }
+        
+        stmt.run([email.toLowerCase(), finalName, finalFamilyName, finalLinkedin, finalFacebook]);
+        
+        // Record each email as a recent search
+        recordRecentSearch(email.toLowerCase());
+        
+        results.push({ 
+            email, 
+            name: finalName, 
+            familyName: finalFamilyName, 
+            linkedin: finalLinkedin, 
+            facebook: finalFacebook 
+        });
     }
     stmt.finalize(() => res.json({ results }));
 });
@@ -228,10 +304,121 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
+// API: Get all admins
+app.get('/api/admins', (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated' });
+    
+    db.all('SELECT id, email FROM admins ORDER BY email', (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        res.json(rows);
+    });
+});
+
+// API: Add admin
+app.post('/api/add-admin', async (req, res) => {
+    try {
+        if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated' });
+        
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+        
+        const bcrypt = await import('bcrypt');
+        const hashedPassword = await bcrypt.hash(password, 10);
+        
+        db.run('INSERT INTO admins (email, password_hash) VALUES (?, ?)', 
+            [email, hashedPassword], 
+            function(err) {
+                if (err) {
+                    if (err.message.includes('UNIQUE constraint failed')) {
+                        return res.status(400).json({ error: 'Admin with this email already exists' });
+                    }
+                    return res.status(500).json({ error: 'Database error' });
+                }
+                res.json({ success: true, message: 'Admin added successfully' });
+            }
+        );
+    } catch (e) {
+        res.status(500).json({ error: 'Server error', details: String(e) });
+    }
+});
+
+// API: Update admin
+app.post('/api/update-admin', async (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated' });
+    
+    const { id, email, password } = req.body;
+    if (!id || !email) return res.status(400).json({ error: 'ID and email required' });
+    
+    try {
+        if (password && password.trim() !== '') {
+            // Update both email and password
+            const bcrypt = await import('bcrypt');
+            const hashedPassword = await bcrypt.hash(password, 10);
+            
+            db.run('UPDATE admins SET email = ?, password_hash = ? WHERE id = ?', 
+                [email, hashedPassword, id], 
+                function(err) {
+                    if (err) {
+                        if (err.message.includes('UNIQUE constraint failed')) {
+                            return res.status(400).json({ error: 'Admin with this email already exists' });
+                        }
+                        return res.status(500).json({ error: 'Database error' });
+                    }
+                    if (this.changes === 0) {
+                        return res.status(404).json({ error: 'Admin not found' });
+                    }
+                    res.json({ success: true, message: 'Admin updated successfully' });
+                }
+            );
+        } else {
+            // Update only email
+            db.run('UPDATE admins SET email = ? WHERE id = ?', [email, id], function(err) {
+                if (err) {
+                    if (err.message.includes('UNIQUE constraint failed')) {
+                        return res.status(400).json({ error: 'Admin with this email already exists' });
+                    }
+                    return res.status(500).json({ error: 'Database error' });
+                }
+                if (this.changes === 0) {
+                    return res.status(404).json({ error: 'Admin not found' });
+                }
+                res.json({ success: true, message: 'Admin updated successfully' });
+            });
+        }
+    } catch (e) {
+        res.status(500).json({ error: 'Server error', details: String(e) });
+    }
+});
+
+// API: Delete admin
+app.post('/api/delete-admin', (req, res) => {
+    if (!req.session.userId) return res.status(401).json({ error: 'Not authenticated' });
+    
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'ID required' });
+    
+    db.run('DELETE FROM admins WHERE id = ?', [id], function(err) {
+        if (err) {
+            return res.status(500).json({ error: 'Database error' });
+        }
+        if (this.changes === 0) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+        res.json({ success: true, message: 'Admin deleted successfully' });
+    });
+});
+
 // Admin database page placeholder (protect)
 app.get('/database', (req, res) => {
     if (!req.session.userId) return res.redirect('/auth/login');
     res.sendFile(path.join(__dirname, 'static', 'database.html'));
+});
+
+// Frontoffice page
+app.get('/frontoffice', (req, res) => {
+    res.sendFile(path.join(__dirname, 'static', 'frontoffice.html'));
 });
 
 // Gemini AI page

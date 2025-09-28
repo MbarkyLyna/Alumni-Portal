@@ -24,7 +24,8 @@ authRouter.post('/login', express.json(), (req, res) => {
         const ok = await bcrypt.compare(password, row.password_hash);
         if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
         req.session.userId = row.id;
-        res.json({ ok: true });
+        req.session.adminEmail = row.email;
+        res.json({ ok: true, email: row.email });
     });
 });
 

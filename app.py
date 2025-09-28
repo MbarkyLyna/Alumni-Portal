@@ -17,23 +17,20 @@ class AlumniAI:
     def __init__(self):
         self.recent_searches = []
         self.alumni_database = []
-        # Configure Gemini AI (currently disabled due to quota limits)
+        # Configure Gemini AI
         self.gemini_available = False
-        print("Gemini AI disabled - using fallback responses")
-        
-        # Uncomment and update API key when quota is available:
-        # try:
-        #     genai.configure(api_key="YOUR_NEW_API_KEY_HERE")
-        #     self.chat_model = genai.GenerativeModel('gemini-1.5-flash')
-        #     test_response = self.chat_model.generate_content("Hello")
-        #     if test_response and hasattr(test_response, 'text'):
-        #         self.gemini_available = True
-        #         print("Gemini AI successfully initialized")
-        #     else:
-        #         print("Gemini AI test failed - using fallback")
-        # except Exception as e:
-        #     print(f"Gemini AI not available: {e}")
-        #     self.gemini_available = False
+        try:
+            genai.configure(api_key="AIzaSyD31wFxP6RENLmOdSOB3HRnZzi2drk4BxE")
+            self.chat_model = genai.GenerativeModel('gemini-1.5-flash')
+            test_response = self.chat_model.generate_content("Hello")
+            if test_response and hasattr(test_response, 'text'):
+                self.gemini_available = True
+                print("Gemini AI successfully initialized")
+            else:
+                print("Gemini AI test failed - using fallback")
+        except Exception as e:
+            print(f"Gemini AI not available: {e}")
+            self.gemini_available = False
 
     def extract_name_from_email(self, email: str) -> Tuple[Optional[str], Optional[str]]:
         match = re.match(r'(\w+)\.(\w+)@esprit\.tn', email.lower())
